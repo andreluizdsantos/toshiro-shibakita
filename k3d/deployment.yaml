@@ -49,14 +49,12 @@ spec:
     metadata:
       labels:
         app: toshiro
-      annotations: 
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "80"
-        prometheus.io/path: "/metrics"
     spec:
       containers:
         - name: toshiro
           image: matrixsoft1/toshiroapp:v1
+          ports:
+            - containerPort: 80
           env:
             - name: MYSQL_DATABASE
               value: "toshiro_db"
@@ -76,6 +74,7 @@ spec:
     app: toshiro
   ports:
   - port: 80
-    targetPort: 80
+    targetPort: 8080
     nodePort: 30000
+#  type: LoadBalancer
   type: NodePort
