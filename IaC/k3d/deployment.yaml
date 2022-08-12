@@ -1,0 +1,80 @@
+# Deployment do MySQL/ToshiroApp
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0.30
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_DATABASE
+              value: "toshiro_db"
+            - name: MYSQL_USER
+              value: "toshiro"
+            - name: MYSQL_PASSWORD
+              value: "Jaspion#135@"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+spec:
+  selector:
+    app: mysql
+  ports:
+  - port: 3306
+    targetPort: 3306
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: toshiro
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: toshiro
+  template:
+    metadata:
+      labels:
+        app: toshiro
+    spec:
+      containers:
+        - name: toshiro
+          image: matrixsoft1/toshiroapp:v1
+          ports:
+            - containerPort: 80
+          env:
+            - name: MYSQL_DATABASE
+              value: "toshiro_db"
+            - name: MYSQL_USER
+              value: "toshiro"
+            - name: MYSQL_PASSWORD
+              value: "Jaspion#135@"
+            - name: DB_HOST
+              value: "mysql"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: toshiro
+spec:
+  selector:
+    app: toshiro
+  ports:
+  - port: 80
+    targetPort: 8080
+    nodePort: 30000
+#  type: LoadBalancer
+  type: NodePort
